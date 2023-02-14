@@ -1,12 +1,32 @@
 from flask import *
 import requests
-import sys
-import json
+
 
 app = Flask(__name__)
 
+
 @app.route('/location/<pokemon>')
-def send_location(pokemon):
+def send_locations(pokemon):
     pokeapi_url = f'https://pokeapi.co/api/v2/pokemon/{pokemon}/encounters'
     pokemon_json = requests.get(pokeapi_url).json()
-    return pokemon_json
+    locations = parse_locations(pokemon_json)
+    return locations
+
+
+def parse_locations(pokemon_json):
+    locations = []
+    for encounter in pokemon_json:
+        location_name = encounter['location_area']['name']
+        location_dict = {}
+        version_details = encounter['version_details']
+        versions = []
+        for version_detail in version_details:
+            version = version_detail['version']['name']
+            if version in ['red', 'blue', 'yellow']:
+                versions.append(version.title())
+        if versions:
+            location_name = location_name.title().replace('-', ' ')
+            location_dict['location'] = location_name
+            location_dict['versions'] = versions
+            locations.append(location_dict)
+    return locations
