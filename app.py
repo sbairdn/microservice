@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 @app.route('/location/<pokemon>')
 def send_locations(pokemon):
+    """Send location JSON for a `pokemon` ID or name."""
     pokeapi_url = f'https://pokeapi.co/api/v2/pokemon/{pokemon}/encounters'
     pokemon_json = requests.get(pokeapi_url).json()
     locations = parse_locations(pokemon_json)
@@ -14,6 +15,7 @@ def send_locations(pokemon):
 
 
 def parse_locations(pokemon_json):
+    """Get pokemon locations from Red, Yellow, and Blue versions."""
     locations = []
     for encounter in pokemon_json:
         location_name = encounter['location_area']['name']
